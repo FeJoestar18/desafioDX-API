@@ -1,8 +1,11 @@
 package br.com.duxusdesafio.Application.Interfaces.Repository;
 
-import br.com.duxusdesafio.Domain.Entity.Time;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ITimeRepository extends JpaRepository<Time, Long> {
+import br.com.duxusdesafio.Domain.Entity.Time;
 
+public interface ITimeRepository extends JpaRepository<Time, Long> {
+    Optional<Time> findByNomeDoClubeIgnoreCase(String nomeDoClube);
 }

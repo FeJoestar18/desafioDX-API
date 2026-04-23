@@ -19,6 +19,7 @@ import br.com.duxusdesafio.Application.Interfaces.Services.ICadastroService;
 import br.com.duxusdesafio.Domain.Entity.ComposicaoTime;
 import br.com.duxusdesafio.Domain.Entity.Integrante;
 import br.com.duxusdesafio.Domain.Entity.Time;
+import br.com.duxusdesafio.Domain.Validator.TimeValidator;
 
 @Service
 @Transactional
@@ -48,6 +49,9 @@ public class CadastroService implements ICadastroService {
 
     @Override
     public TimeDto cadastrarTime(TimeInputDto timeInput) {
+        TimeValidator.validateUniqueTimeName(timeInput.getNomeDoClube(), null, timeRepository);
+        TimeValidator.validateUniqueIntegranteIds(timeInput.getIntegranteIds());
+
         Time time = new Time();
         time.setNomeDoClube(timeInput.getNomeDoClube());
         time.setData(timeInput.getData());
@@ -87,6 +91,9 @@ public class CadastroService implements ICadastroService {
     @Override
     public TimeDto atualizarTime(long id, TimeInputDto timeInput) {
         Time time = findTimeById(id);
+        TimeValidator.validateUniqueTimeName(timeInput.getNomeDoClube(), id, timeRepository);
+        TimeValidator.validateUniqueIntegranteIds(timeInput.getIntegranteIds());
+
         time.setNomeDoClube(timeInput.getNomeDoClube());
         time.setData(timeInput.getData());
 
