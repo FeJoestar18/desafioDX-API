@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,9 +30,10 @@ public class ApiController {
 
     @ApiOperation("Retorna o time formado em uma data específica")
     @GetMapping("/time")
-    public TimeDto timeDaData(
+    public ResponseEntity<TimeDto> timeDaData(
             @RequestParam @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate data) {
-        return service.timeDaData(data);
+        TimeDto time = service.timeDaData(data);
+        return ResponseEntity.of(java.util.Optional.ofNullable(time));
     }
 
     @ApiOperation("Retorna o integrante que mais apareceu em times no período")
