@@ -1,6 +1,8 @@
 # Duxus Desafio - API de Gerenciamento de Escalação de Times
 
-Uma API REST robusta desenvolvida em Java com Spring Boot para o gerenciamento de times e suas respectivas escalações. Este projeto resolve o desafio técnico proposto pela Duxus, focando na aplicação de regras de negócio complexas para análise de integrantes, times, funções e clubes em determinados períodos.
+Uma API REST robusta desenvolvida em Java com Spring Boot para o gerenciamento de times e suas respectivas escalações. \
+\
+Este projeto resolve o desafio técnico proposto pela Duxus, focando na aplicação de regras de negócio complexas para análise de integrantes, times, funções e clubes em determinados períodos.
 
 ## Tecnologias Utilizadas
 
@@ -17,23 +19,32 @@ O projeto foi construído utilizando as ferramentas e práticas mais modernas do
 
 ## Como rodar o projeto
 
-A aplicação foi configurada para ser flexível e suporta diferentes ambientes através de **Spring Profiles**. Você pode executá-la utilizando um banco de dados em memória (H2) para testes rápidos e desenvolvimento, ou PostgreSQL para um ambiente mais robusto e semelhante à produção.
+A aplicação foi configurada para ser flexível e suporta diferentes ambientes através de **Spring Profiles**. Você pode executá-la utilizando:
+
+- **H2 em memória** para desenvolvimento rápido e testes locais.
+- **PostgreSQL local** para desenvolvimento com um banco real na sua máquina.
+- **PostgreSQL via Docker Compose** para replicar o ambiente de contêiner.
 
 ### 1. Pré-requisitos
+
 - Java 17 ou superior
 - Maven
 - Docker e Docker Compose (para rodar via contêiner)
+- PostgreSQL local se quiser usar esse modo específico
 
-### 2. Configurando o ambiente (.env)
-Antes de iniciar, crie um arquivo `.env` na raiz do projeto. Ele será usado tanto para rodar localmente com PostgreSQL quanto via Docker Compose.
+### 2. Configurando o ambiente (`.env`)
+
+Crie um arquivo `.env` na raiz do projeto com as variáveis abaixo.
+
+#### Exemplo de `.env` para PostgreSQL local
 
 ```env
-# Database configuration for PostgreSQL
-DB_PORT=5433
-DB_URL=jdbc:postgresql://postgres:5432/duxus
-DB_USERNAME=seu_usuario
+DB_HOST=localhost
+DB_PORT=5432
+DB_URL=jdbc:postgresql://localhost:5432/duxus
+DB_USERNAME=postgres
 DB_PASSWORD=sua_senha
-SPRING_PROFILES_ACTIVE=docker
+SPRING_PROFILES_ACTIVE=postgres
 
 # H2 profile (Banco em memória)
 H2_URL=jdbc:h2:mem:duxus;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
@@ -54,60 +65,117 @@ TEST_DB_DDL_AUTO=create-drop
 TEST_SHOW_SQL=false
 ```
 
-### 3. Escolhendo como rodar a aplicação
+#### Exemplo de `.env` para Docker Compose
 
-Você possui 3 opções principais para executar o projeto:
+```env
+DB_HOST=localhost
+DB_PORT=5433
+DB_URL=jdbc:postgresql://localhost:5433/duxus
+DB_USERNAME=postgres
+DB_PASSWORD=sua_senha
+SPRING_PROFILES_ACTIVE=docker
 
-#### Opção A: Rodando Localmente com H2 (Banco em Memória)
-Esta é a forma mais rápida de testar a aplicação. O banco será criado em memória ao iniciar e destruído ao finalizar.
-
-1. Altere no seu `.env` a variável `SPRING_PROFILES_ACTIVE=h2`.
-2. Execute o comando:
-   ```bash
-   mvn spring-boot:run
-   ```
-*(Alternativa: `mvn spring-boot:run -Dspring-boot.run.arguments=--spring.profiles.active=h2` para não precisar editar o `.env`)*
-
-#### Opção B: Rodando com Docker (Recomendado)
-Sobe a aplicação e o banco de dados PostgreSQL simultaneamente, garantindo consistência.
-
-1. Certifique-se de que o `.env` contém `SPRING_PROFILES_ACTIVE=docker`.
-2. Execute o comando:
-   ```bash
-   docker-compose up -d --build
-   ```
-
-#### Opção C: Rodando Localmente com PostgreSQL
-Se desejar rodar apenas a aplicação localmente, mas conectada a um PostgreSQL externo:
-
-1. Certifique-se de ter um banco PostgreSQL rodando (porta 5433 conforme configuração).
-2. Deixe `SPRING_PROFILES_ACTIVE=docker` no seu `.env`.
-3. Execute o comando:
-   ```bash
-   mvn spring-boot:run
-   ```
-
----
-
-### Como acessar o banco H2 via Console
-
-Atualmente o projeto não tem o console H2 habilitado por padrão. Se quiser acessá-lo (quando rodando o profile `h2`), adicione as seguintes propriedades no arquivo `src/main/resources/application-h2.properties`:
-
-```properties
-spring.h2.console.enabled=true
-spring.h2.console.path=/h2-console
+# H2 profile (Banco em memória)
+H2_URL=jdbc:h2:mem:duxus;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+H2_DRIVER=org.h2.Driver
+H2_USERNAME=sa
+H2_PASSWORD=
+H2_DIALECT=org.hibernate.dialect.H2Dialect
+H2_DDL_AUTO=create-drop
+H2_SHOW_SQL=true
 ```
 
-Após iniciar a aplicação, abra no navegador:
-`http://localhost:8080/h2-console`
+> **Importante:** quando o projeto roda no Docker, o host mapeado expõe o PostgreSQL em `localhost:5433` para evitar conflito com um PostgreSQL local em `5432`. O container da aplicação em Docker ainda acessa o banco pelo serviço interno `postgres:5432`.
 
-Utilize as credenciais:
-- **JDBC URL:** `jdbc:h2:mem:duxus`
-- **User:** `sa`
-- **Password:** *(deixe em branco)*
+### 3. Troubleshooting de PostgreSQL local
 
-> **Importante sobre a arquitetura do H2 no Docker:**
-> O H2 em memória roda *dentro do próprio container da aplicação*. Não há um container de banco de dados H2 separado rodando no Docker Compose. Se o console do H2 não estiver habilitado explicitamente, não haverá como "conectar externamente" para visualizar as tabelas.
+Se você usar `SPRING_PROFILES_ACTIVE=postgres` e receber um erro como:
+
+- `Connection refused`
+- `Connection to localhost:5433 refused`
+- `UnknownHostException: postgres`
+
+então provavelmente o banco PostgreSQL não está escutando no host/porta configurados.
+
+Verifique:
+
+- `DB_HOST` deve ser `localhost` ou o host correto do PostgreSQL local.
+- `DB_PORT` deve ser a porta do PostgreSQL local.
+- `DB_URL` deve refletir `DB_HOST` e `DB_PORT`, por exemplo:
+  ```env
+  DB_URL=jdbc:postgresql://localhost:5432/duxus
+  ```
+- `SPRING_PROFILES_ACTIVE=postgres` para usar `application-postgres.properties`.
+
+Se estiver usando PostgreSQL local padrão na porta 5432, atualize no `.env`:
+
+```env
+DB_HOST=localhost
+DB_PORT=5432
+DB_URL=jdbc:postgresql://localhost:5432/duxus
+SPRING_PROFILES_ACTIVE=postgres
+```
+
+Se a conexão na porta correta cair com erro de senha (`FATAL: autenticação do tipo senha falhou`), o Postgres está ativo, mas a senha de `postgres` está incorreta. Nesse caso, redefine a senha do usuário PostgreSQL local antes de rodar a aplicação:
+
+```bash
+sudo -u postgres psql
+ALTER USER postgres WITH PASSWORD 'sua_senha';
+\q
+```
+
+Depois atualize `DB_PASSWORD` no `.env` com a senha correta.
+
+### 4. Perfis suportados
+
+- `h2`: usa banco H2 em memória.
+- `postgres`: usa PostgreSQL local configurado via `DB_URL`.
+- `docker`: usa PostgreSQL dentro do Docker Compose.
+
+### 4. Como executar
+
+#### Opção A: H2 local
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.arguments=--spring.profiles.active=h2
+```
+
+Ou altere no `.env`:
+
+```env
+SPRING_PROFILES_ACTIVE=h2
+```
+
+#### Opção B: PostgreSQL local
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.arguments=--spring.profiles.active=postgres
+```
+
+Ou altere no `.env`:
+
+```env
+SPRING_PROFILES_ACTIVE=postgres
+```
+
+#### Opção C: Docker Compose com PostgreSQL
+
+```bash
+docker-compose up -d --build
+```
+
+### 5. Detalhes importantes
+
+- O perfil `h2` é ideal para desenvolvimento rápido, pois não exige banco externo.
+- O perfil `postgres` conecta a aplicação ao PostgreSQL local definido em `DB_URL`.
+- O perfil `docker` conecta a aplicação ao serviço `postgres` definido em `docker-compose.yml`.
+- Se nenhuma variável `SPRING_PROFILES_ACTIVE` estiver definida, o perfil padrão é `h2`.
+
+### 6. Rodando testes
+
+```bash
+mvn clean test
+```
 
 ---
 
