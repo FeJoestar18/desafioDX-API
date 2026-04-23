@@ -2,6 +2,7 @@ package br.com.duxusdesafio.Application.Dto;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 public class TimeDto {
 
@@ -50,5 +51,23 @@ public class TimeDto {
 
     public void setIntegrantes(List<IntegranteDto> integrantes) {
         this.integrantes = integrantes;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof TimeDto))
+            return false;
+        TimeDto timeDto = (TimeDto) o;
+        return id == timeDto.id &&
+                Objects.equals(nomeDoClube, timeDto.nomeDoClube) &&
+                Objects.equals(data, timeDto.data) &&
+                Objects.equals(integrantes, timeDto.integrantes);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, nomeDoClube, data, integrantes);
     }
 }

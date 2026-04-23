@@ -9,29 +9,37 @@ import com.tngtech.java.junit.dataprovider.UseDataProvider;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 
 import java.time.LocalDate;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
+
+import br.com.duxusdesafio.Application.Dto.IntegranteDto;
+import br.com.duxusdesafio.Application.Dto.TimeDto;
+import br.com.duxusdesafio.Application.Interfaces.Repository.ITimeRepository;
 
 @RunWith(DataProviderRunner.class)
 public class TesteApiService {
 
-    private final static LocalDate data1993 = LocalDate.of(1993,1, 1);
-    private final static LocalDate data1994 = LocalDate.of(1994,1, 1);
-    private final static LocalDate data1995 = LocalDate.of(1995,1, 1);
+    private final static LocalDate data1993 = LocalDate.of(1993, 1, 1);
+    private final static LocalDate data1994 = LocalDate.of(1994, 1, 1);
+    private final static LocalDate data1995 = LocalDate.of(1995, 1, 1);
 
-    @Spy
+    @Mock
+    private ITimeRepository timeRepository;
+
+    @InjectMocks
     private ApiService apiService;
 
     @Before
     public void init() {
         MockitoAnnotations.openMocks(this);
     }
-
 
     @DataProvider
     public static Object[][] testTimeDaDataParams() {
@@ -43,7 +51,7 @@ public class TesteApiService {
         Time timeChicagoBullsDe1995 = dadosParaTesteApiService.getTimeChicagoBullsDe1995();
         Time timeDetroidPistonsDe1993 = dadosParaTesteApiService.getTimeDetroidPistonsDe1993();
 
-        return new Object[][]{
+        return new Object[][] {
                 {
                         data1995,
                         todosOsTimes,
@@ -61,12 +69,13 @@ public class TesteApiService {
     @UseDataProvider("testTimeDaDataParams")
     public void testTimeDaData(LocalDate data, List<Time> todosOsTimes, Time esperado) {
 
-        Time timeRetornado = apiService.timeDaData(data, todosOsTimes);
+        when(timeRepository.findAll()).thenReturn(todosOsTimes);
 
-        assertEquals(esperado, timeRetornado);
+        TimeDto timeRetornado = apiService.timeDaData(data);
+        TimeDto esperadoDto = toTimeDto(esperado);
+
+        assertEquals(esperadoDto, timeRetornado);
     }
-
-
 
     @DataProvider
     public static Object[][] testIntegranteMaisUsadoParams() {
@@ -75,7 +84,7 @@ public class TesteApiService {
 
         List<Time> todosOsTimes = dadosParaTesteApiService.getTodosOsTimes();
 
-        return new Object[][]{
+        return new Object[][] {
                 {
                         data1993,
                         data1995,
@@ -85,17 +94,18 @@ public class TesteApiService {
         };
     }
 
-
     @Test
     @UseDataProvider("testIntegranteMaisUsadoParams")
-    public void testIntegranteMaisUsado(LocalDate dataInicial, LocalDate dataFinal, List<Time> todosOsTimes, Integrante esperado) {
+    public void testIntegranteMaisUsado(LocalDate dataInicial, LocalDate dataFinal, List<Time> todosOsTimes,
+            Integrante esperado) {
 
-        Integrante integranteRetornado = apiService.integranteMaisUsado(dataInicial, dataFinal, todosOsTimes);
+        when(timeRepository.findAll()).thenReturn(todosOsTimes);
 
-        assertEquals(esperado, integranteRetornado);
+        IntegranteDto integranteRetornado = apiService.integranteMaisUsado(dataInicial, dataFinal);
+        IntegranteDto esperadoDto = toIntegranteDto(esperado);
+
+        assertEquals(esperadoDto, integranteRetornado);
     }
-
-
 
     @DataProvider
     public static Object[][] testTimeMaisRecorrenteParams() {
@@ -105,9 +115,8 @@ public class TesteApiService {
         List<String> integrantesEsperados = Arrays.asList(
                 dadosParaTesteApiService.getDenis_rodman().getNome(),
                 dadosParaTesteApiService.getMichael_jordan().getNome(),
-                dadosParaTesteApiService.getScottie_pippen().getNome()
-        );
-        return new Object[][]{
+                dadosParaTesteApiService.getScottie_pippen().getNome());
+        return new Object[][] {
                 {
                         data1993,
                         data1995,
@@ -119,18 +128,20 @@ public class TesteApiService {
 
     @Test
     @UseDataProvider("testTimeMaisRecorrenteParams")
-    public void testIntegrantesDoTimeMaisRecorrente(LocalDate dataInicial, LocalDate dataFinal, List<Time> todosOsTimes, List<String> esperado) {
+    public void testIntegrantesDoTimeMaisRecorrente(LocalDate dataInicial, LocalDate dataFinal, List<Time> todosOsTimes,
+            List<String> esperado) {
 
-        List<String> nomeDosIntegrantesDoTimeMaisRecorrente = apiService.integrantesDoTimeMaisRecorrente(dataInicial, dataFinal, todosOsTimes);
+        when(timeRepository.findAll()).thenReturn(todosOsTimes);
 
-        if(nomeDosIntegrantesDoTimeMaisRecorrente != null){
+        List<String> nomeDosIntegrantesDoTimeMaisRecorrente = apiService.integrantesDoTimeMaisRecorrente(dataInicial,
+                dataFinal);
+
+        if (nomeDosIntegrantesDoTimeMaisRecorrente != null) {
             nomeDosIntegrantesDoTimeMaisRecorrente.sort(Comparator.naturalOrder());
         }
 
         assertEquals(esperado, nomeDosIntegrantesDoTimeMaisRecorrente);
     }
-
-
 
     @DataProvider
     public static Object[][] testFuncaoMaisRecorrenteParams() {
@@ -138,7 +149,7 @@ public class TesteApiService {
         DadosParaTesteApiService dadosParaTesteApiService = new DadosParaTesteApiService();
         List<Time> todosOsTimes = dadosParaTesteApiService.getTodosOsTimes();
 
-        return new Object[][]{
+        return new Object[][] {
                 {
                         data1993,
                         data1995,
@@ -150,9 +161,12 @@ public class TesteApiService {
 
     @Test
     @UseDataProvider("testFuncaoMaisRecorrenteParams")
-    public void testFuncaoMaisRecorrente(LocalDate dataInicial, LocalDate dataFinal, List<Time> todosOsTimes, String esperado) {
+    public void testFuncaoMaisRecorrente(LocalDate dataInicial, LocalDate dataFinal, List<Time> todosOsTimes,
+            String esperado) {
 
-        String funcaoMaisRecorrente = apiService.funcaoMaisRecorrente(dataInicial, dataFinal, todosOsTimes);
+        when(timeRepository.findAll()).thenReturn(todosOsTimes);
+
+        String funcaoMaisRecorrente = apiService.funcaoMaisRecorrente(dataInicial, dataFinal);
 
         assertEquals(esperado, funcaoMaisRecorrente);
     }
@@ -162,7 +176,7 @@ public class TesteApiService {
         DadosParaTesteApiService dadosParaTesteApiService = new DadosParaTesteApiService();
         List<Time> todosOsTimes = dadosParaTesteApiService.getTodosOsTimes();
 
-        return new Object[][]{
+        return new Object[][] {
                 {
                         data1993,
                         data1995,
@@ -174,9 +188,12 @@ public class TesteApiService {
 
     @Test
     @UseDataProvider("testClubeMaisRecorrenteParams")
-    public void testClubeMaisRecorrente(LocalDate dataInicial, LocalDate dataFinal, List<Time> todosOsTimes, String esperado) {
+    public void testClubeMaisRecorrente(LocalDate dataInicial, LocalDate dataFinal, List<Time> todosOsTimes,
+            String esperado) {
 
-        String clubeMaisRecorrente = apiService.clubeMaisRecorrente(dataInicial, dataFinal, todosOsTimes);
+        when(timeRepository.findAll()).thenReturn(todosOsTimes);
+
+        String clubeMaisRecorrente = apiService.clubeMaisRecorrente(dataInicial, dataFinal);
         assertEquals(esperado, clubeMaisRecorrente);
     }
 
@@ -193,7 +210,7 @@ public class TesteApiService {
         Map<String, Long> esperado2 = new HashMap<>();
         esperado2.put(dadosParaTesteApiService.getClubeChicagoBulls(), 2L);
 
-        return new Object[][]{
+        return new Object[][] {
                 {
                         data1993,
                         data1995,
@@ -211,13 +228,14 @@ public class TesteApiService {
 
     @Test
     @UseDataProvider("testContagemDeClubesParams")
-    public void testcontagemDeClubesNoPeriodo(LocalDate dataInicial, LocalDate dataFinal, List<Time> todosOsTimes, Map<String, Long> esperado) {
+    public void testcontagemDeClubesNoPeriodo(LocalDate dataInicial, LocalDate dataFinal, List<Time> todosOsTimes,
+            Map<String, Long> esperado) {
 
-        Map<String, Long> contagemDeClubesNoPeriodo = apiService.contagemDeClubesNoPeriodo(dataInicial, dataFinal, todosOsTimes);
+        when(timeRepository.findAll()).thenReturn(todosOsTimes);
+
+        Map<String, Long> contagemDeClubesNoPeriodo = apiService.contagemDeClubesNoPeriodo(dataInicial, dataFinal);
         assertEquals(esperado, contagemDeClubesNoPeriodo);
     }
-
-
 
     @DataProvider
     public static Object[][] testContagemPorFuncaoParams() {
@@ -229,7 +247,7 @@ public class TesteApiService {
         esperado.put("ala", 2L);
         esperado.put("ala-pivô", 1L);
 
-        return new Object[][]{
+        return new Object[][] {
                 {
                         data1993,
                         data1995,
@@ -241,10 +259,23 @@ public class TesteApiService {
 
     @Test
     @UseDataProvider("testContagemPorFuncaoParams")
-    public void testContagemPorFuncao(LocalDate dataInicial, LocalDate dataFinal, List<Time> todosOsTimes, Map<String, Long> esperado) {
+    public void testContagemPorFuncao(LocalDate dataInicial, LocalDate dataFinal, List<Time> todosOsTimes,
+            Map<String, Long> esperado) {
 
-        Map<String, Long> contagemPorFuncao = apiService.contagemPorFuncao(dataInicial, dataFinal, todosOsTimes);
+        when(timeRepository.findAll()).thenReturn(todosOsTimes);
+
+        Map<String, Long> contagemPorFuncao = apiService.contagemPorFuncao(dataInicial, dataFinal);
         assertEquals(esperado, contagemPorFuncao);
     }
 
+    private TimeDto toTimeDto(Time time) {
+        List<IntegranteDto> integrantes = time.getComposicaoTime().stream()
+                .map(c -> toIntegranteDto(c.getIntegrante()))
+                .toList();
+        return new TimeDto(time.getId(), time.getNomeDoClube(), time.getData(), integrantes);
+    }
+
+    private IntegranteDto toIntegranteDto(Integrante integrante) {
+        return new IntegranteDto(integrante.getId(), integrante.getNome(), integrante.getFuncao());
+    }
 }

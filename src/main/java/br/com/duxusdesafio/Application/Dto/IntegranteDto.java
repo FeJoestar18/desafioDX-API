@@ -1,5 +1,7 @@
 package br.com.duxusdesafio.Application.Dto;
 
+import java.util.Objects;
+
 public class IntegranteDto {
 
     private long id;
@@ -37,5 +39,22 @@ public class IntegranteDto {
 
     public void setFuncao(String funcao) {
         this.funcao = funcao;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof IntegranteDto))
+            return false;
+        IntegranteDto that = (IntegranteDto) o;
+        return id == that.id &&
+                Objects.equals(nome, that.nome) &&
+                Objects.equals(funcao, that.funcao);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, nome, funcao);
     }
 }
