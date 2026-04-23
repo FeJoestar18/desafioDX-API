@@ -1,9 +1,5 @@
 # Arquitetura
 
-## Padrão
-
-- **Clean Architecture / Layered Architecture**
-
 ## Camadas
 
 - **WebApi**: Controllers e entrada HTTP
