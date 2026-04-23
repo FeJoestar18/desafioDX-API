@@ -1,4 +1,4 @@
-package br.com.duxusdesafio.model;
+package br.com.duxusdesafio.Domain.Entity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;

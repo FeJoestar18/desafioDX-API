@@ -1,7 +1,8 @@
-package br.com.duxusdesafio.service;
+package br.com.duxusdesafio.Service;
 
-import br.com.duxusdesafio.model.Integrante;
-import br.com.duxusdesafio.model.Time;
+import br.com.duxusdesafio.Infrastructure.Service.ApiService;
+import br.com.duxusdesafio.Domain.Entity.Integrante;
+import br.com.duxusdesafio.Domain.Entity.Time;
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
 import com.tngtech.java.junit.dataprovider.UseDataProvider;
