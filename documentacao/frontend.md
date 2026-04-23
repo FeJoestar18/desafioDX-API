@@ -8,11 +8,27 @@
 
 ## Repositório
 
-[Front-End](https://github.com/FeJoestar18/desafioDX-Front.git)
+[Link do Repositório](https://github.com/FeJoestar18/desafioDX-Front.git)
 
 ## Integração
 
 O frontend consome a API via endpoints REST.
+
+## Como executar
+
+No repositório do frontend:
+
+```bash
+npm install
+npm run dev
+```
+
+Em paralelo, execute este backend e certifique-se de que a API esteja disponível em `http://localhost:8080`.
+
+## Configuração de API
+
+- Endpoint base da API: `http://localhost:8080`
+- O frontend está preparado para consumir os serviços REST deste backend.
 
 ### Diagrama de Comunicação
 

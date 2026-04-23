@@ -47,9 +47,10 @@ public class CadastroService implements ICadastroService {
 
     @Override
     public IntegranteDto cadastrarIntegrante(IntegranteInputDto integranteInput) {
+        Cargo cargo = findCargoById(integranteInput.getCargoId());
         Integrante integrante = new Integrante();
         integrante.setNome(integranteInput.getNome());
-        integrante.setFuncao(integranteInput.getFuncao());
+        integrante.setCargo(cargo);
         Integrante salvo = integranteRepository.save(integrante);
         return toIntegranteDto(salvo);
     }
@@ -79,8 +80,9 @@ public class CadastroService implements ICadastroService {
     @Override
     public IntegranteDto atualizarIntegrante(long id, IntegranteInputDto integranteInput) {
         Integrante integrante = findIntegranteById(id);
+        Cargo cargo = findCargoById(integranteInput.getCargoId());
         integrante.setNome(integranteInput.getNome());
-        integrante.setFuncao(integranteInput.getFuncao());
+        integrante.setCargo(cargo);
         Integrante atualizado = integranteRepository.save(integrante);
         return toIntegranteDto(atualizado);
     }

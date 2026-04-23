@@ -9,7 +9,9 @@ import br.com.duxusdesafio.Application.Interfaces.Repository.IIntegranteReposito
 import br.com.duxusdesafio.Application.Interfaces.Repository.ITimeRepository;
 import br.com.duxusdesafio.Infrastructure.Service.CadastroService;
 import br.com.duxusdesafio.Domain.Entity.Integrante;
+import br.com.duxusdesafio.Domain.Entity.Cargo;
 import br.com.duxusdesafio.Domain.Entity.Time;
+import br.com.duxusdesafio.Application.Interfaces.Repository.ICargoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -35,6 +37,9 @@ public class CadastroServiceTest {
     @Mock
     private IComposicaoTimeRepository composicaoTimeRepository;
 
+    @Mock
+    private ICargoRepository cargoRepository;
+
     @InjectMocks
     private CadastroService cadastroService;
 
@@ -45,16 +50,21 @@ public class CadastroServiceTest {
 
     @Test
     public void shouldCadastrarIntegrante() {
-        IntegranteInputDto input = new IntegranteInputDto("Bangalore", "Atacante");
+        IntegranteInputDto integranteInput = new IntegranteInputDto("Bangalore", 1L);
+
+        Cargo cargo = new Cargo("Atacante");
+        cargo.setId(1L);
+        when(cargoRepository.findById(1L)).thenReturn(Optional.of(cargo));
+
         Integrante integrante = new Integrante();
         integrante.setId(1L);
         integrante.setNome("Bangalore");
-        integrante.setFuncao("Atacante");
+        integrante.setCargo(cargo);
 
         when(integranteRepository.save(org.mockito.ArgumentMatchers.any(Integrante.class)))
                 .thenReturn(integrante);
 
-        IntegranteDto resultado = cadastroService.cadastrarIntegrante(input);
+        IntegranteDto resultado = cadastroService.cadastrarIntegrante(integranteInput);
 
         assertNotNull(resultado);
         assertEquals(1L, resultado.getId());
@@ -70,10 +80,13 @@ public class CadastroServiceTest {
         timeSaved.setNomeDoClube("Falcons");
         timeSaved.setData(LocalDate.of(2021, 1, 15));
 
+        Cargo cargo = new Cargo("Atacante");
+        cargo.setId(1L);
+
         Integrante integrante = new Integrante();
         integrante.setId(1L);
         integrante.setNome("Bangalore");
-        integrante.setFuncao("Atacante");
+        integrante.setCargo(cargo);
 
         when(timeRepository.save(org.mockito.ArgumentMatchers.any(Time.class)))
                 .thenReturn(timeSaved);

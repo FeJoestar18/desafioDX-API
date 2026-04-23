@@ -1,8 +1,10 @@
 package br.com.duxusdesafio.Infrastructure.Config.Data;
 
+import br.com.duxusdesafio.Domain.Entity.Cargo;
 import br.com.duxusdesafio.Domain.Entity.ComposicaoTime;
 import br.com.duxusdesafio.Domain.Entity.Integrante;
 import br.com.duxusdesafio.Domain.Entity.Time;
+import br.com.duxusdesafio.Application.Interfaces.Repository.ICargoRepository;
 import br.com.duxusdesafio.Application.Interfaces.Repository.IIntegranteRepository;
 import br.com.duxusdesafio.Application.Interfaces.Repository.IComposicaoTimeRepository;
 import br.com.duxusdesafio.Application.Interfaces.Repository.ITimeRepository;
@@ -20,22 +22,29 @@ public class DataSeeder {
     public CommandLineRunner seedData(
             IIntegranteRepository integranteRepo,
             ITimeRepository timeRepo,
-            IComposicaoTimeRepository composicaoRepo
+            IComposicaoTimeRepository composicaoRepo,
+            ICargoRepository cargoRepo
     ) {
         return args -> {
             if (integranteRepo.count() > 0) return;
 
+            // Cargos
+            Cargo atacante = cargoRepo.save(new Cargo("Atacante"));
+            Cargo meioCampo = cargoRepo.save(new Cargo("Meio-campo"));
+            Cargo defesa = cargoRepo.save(new Cargo("Defesa"));
+            Cargo suporte = cargoRepo.save(new Cargo("Suporte"));
+
             // Integrantes - Futebol
-            Integrante bangalore  = integranteRepo.save(new Integrante("Bangalore",  "Atacante", null));
-            Integrante bloodhound = integranteRepo.save(new Integrante("BloodHound", "Meio-campo", null));
-            Integrante crypto     = integranteRepo.save(new Integrante("Crypto",     "Defesa", null));
-            Integrante wraith     = integranteRepo.save(new Integrante("Wraith",     "Atacante", null));
-            Integrante lifeline   = integranteRepo.save(new Integrante("Lifeline",   "Suporte", null));
-            Integrante pathfinder = integranteRepo.save(new Integrante("Pathfinder", "Meio-campo", null));
-            Integrante octane     = integranteRepo.save(new Integrante("Octane",     "Atacante", null));
-            Integrante gibraltar  = integranteRepo.save(new Integrante("Gibraltar",  "Defesa", null));
-            Integrante caustic    = integranteRepo.save(new Integrante("Caustic",    "Defesa", null));
-            Integrante mirage     = integranteRepo.save(new Integrante("Mirage",     "Meio-campo", null));
+            Integrante bangalore  = integranteRepo.save(new Integrante("Bangalore",  atacante, null));
+            Integrante bloodhound = integranteRepo.save(new Integrante("BloodHound", meioCampo, null));
+            Integrante crypto     = integranteRepo.save(new Integrante("Crypto",     defesa, null));
+            Integrante wraith     = integranteRepo.save(new Integrante("Wraith",     atacante, null));
+            Integrante lifeline   = integranteRepo.save(new Integrante("Lifeline",   suporte, null));
+            Integrante pathfinder = integranteRepo.save(new Integrante("Pathfinder", meioCampo, null));
+            Integrante octane     = integranteRepo.save(new Integrante("Octane",     atacante, null));
+            Integrante gibraltar  = integranteRepo.save(new Integrante("Gibraltar",  defesa, null));
+            Integrante caustic    = integranteRepo.save(new Integrante("Caustic",    defesa, null));
+            Integrante mirage     = integranteRepo.save(new Integrante("Mirage",     meioCampo, null));
 
             // Times
             Time falcons1 = timeRepo.save(new Time("Falcons", LocalDate.of(2021, 1, 15), null));

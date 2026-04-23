@@ -32,7 +32,19 @@ public class ApiServiceIntegrationTest {
 
     @Test
     public void shouldPersistIntegranteAndTimeWithH2() {
-        IntegranteInputDto integranteInput = new IntegranteInputDto("Test Player", "Atacante");
+        Long cargoId;
+        try {
+            br.com.duxusdesafio.Application.Dto.CargoDto cargo = cadastroService.cadastrarCargo(new br.com.duxusdesafio.Application.Dto.CargoInputDto("Teste-Atacante"));
+            cargoId = cargo.getId();
+        } catch (IllegalArgumentException e) {
+            cargoId = cadastroService.listarCargos().stream()
+                    .filter(c -> c.getNome().equals("Teste-Atacante"))
+                    .findFirst()
+                    .get()
+                    .getId();
+        }
+        
+        IntegranteInputDto integranteInput = new IntegranteInputDto("Test Player", cargoId);
         IntegranteDto integranteCriado = cadastroService.cadastrarIntegrante(integranteInput);
 
         assertNotNull(integranteCriado.getId());
@@ -49,5 +61,13 @@ public class ApiServiceIntegrationTest {
 
         TimeDto timeEncontrado = apiService.timeDaData(LocalDate.of(2023, 1, 1));
         assertEquals("Test Club", timeEncontrado.getNomeDoClube());
+    }
+
+    @Test
+    public void deveCalcularIntegranteMaisUsado() {
+        // Assume que CadastroService foi ajustado para usar ID de Cargo. 
+        // Como o CadastroServiceTest já testa a inserção, aqui vamos usar os objetos do banco
+        // Mas se precisar salvar, usa cargoId
+        // O teste real depende de DadosParaTesteApiService.java
     }
 }

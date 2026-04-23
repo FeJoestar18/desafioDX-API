@@ -18,8 +18,9 @@ public class Integrante {
 	private String nome;
 	
 	@NotNull
-	@Column
-	private String funcao;
+	@ManyToOne
+	@JoinColumn(name = "cargo_id")
+	private Cargo cargo;
 	
 	@OneToMany(mappedBy = "integrante")
 	private List<ComposicaoTime> composicaoTime;
@@ -28,9 +29,9 @@ public class Integrante {
 	public Integrante() {
 	}
 
-	public Integrante(String nome, String funcao, List<ComposicaoTime> composicaoTime) {
+	public Integrante(String nome, Cargo cargo, List<ComposicaoTime> composicaoTime) {
 		this.nome = nome;
-		this.funcao = funcao;
+		this.cargo = cargo;
 		this.composicaoTime = composicaoTime;
 	}
 
@@ -50,12 +51,16 @@ public class Integrante {
 		this.nome = nome;
 	}
 
-	public String getFuncao() {
-		return funcao;
+	public Cargo getCargo() {
+		return cargo;
 	}
 
-	public void setFuncao(String funcao) {
-		this.funcao = funcao;
+	public void setCargo(Cargo cargo) {
+		this.cargo = cargo;
+	}
+
+	public String getFuncao() {
+		return cargo != null ? cargo.getNome() : null;
 	}
 
 	public List<ComposicaoTime> getComposicaoTime() {
@@ -72,12 +77,12 @@ public class Integrante {
 		if (this == o) return true;
 		if (!(o instanceof Integrante)) return false;
 		Integrante that = (Integrante) o;
-		return id == that.id && Objects.equals(nome, that.nome) && Objects.equals(funcao, that.funcao);
+		return id == that.id && Objects.equals(nome, that.nome) && Objects.equals(cargo, that.cargo);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, nome, funcao);
+		return Objects.hash(id, nome, cargo);
 	}
 
 	@Override
@@ -85,7 +90,7 @@ public class Integrante {
 		return "Integrante{" +
 				"id=" + id +
 				", nome='" + nome + '\'' +
-				", funcao='" + funcao + '\'' +
+				", cargo=" + cargo +
 				'}';
 	}
 }

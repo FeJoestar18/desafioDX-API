@@ -38,7 +38,7 @@ public class CadastroControllerTest {
 
     @Test
     public void shouldCreateIntegrante() throws Exception {
-        IntegranteInputDto input = new IntegranteInputDto("Bangalore", "Atacante");
+        IntegranteInputDto input = new IntegranteInputDto("Bangalore", 1L);
         IntegranteDto resultado = new IntegranteDto(1L, "Bangalore", "Atacante");
         Mockito.when(service.cadastrarIntegrante(input)).thenReturn(resultado);
 

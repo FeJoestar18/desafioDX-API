@@ -46,13 +46,17 @@ public class DadosParaTesteApiService {
         List<ComposicaoTime> composicaoTime1995 = new ArrayList<>();
         List<ComposicaoTime> composicaoTime1994E1995 = new ArrayList<>();
 
+        // cargos
+        br.com.duxusdesafio.Domain.Entity.Cargo ala = new br.com.duxusdesafio.Domain.Entity.Cargo("ala");
+        br.com.duxusdesafio.Domain.Entity.Cargo alaPivo = new br.com.duxusdesafio.Domain.Entity.Cargo("ala-pivô");
+
         // integrantes
         // nba
-        michael_jordan = new Integrante("Michael Jordan", "ala", composicaoTime1994E1995);
+        michael_jordan = new Integrante("Michael Jordan", ala, composicaoTime1994E1995);
         michael_jordan.setId(1L);
-        denis_rodman = new Integrante("Denis Rodman", "ala-pivô", composicaoTime1995);
+        denis_rodman = new Integrante("Denis Rodman", alaPivo, composicaoTime1995);
         denis_rodman.setId(2L);
-        scottie_pippen = new Integrante("Scottie Pippen", "ala", composicaoTime1995);
+        scottie_pippen = new Integrante("Scottie Pippen", ala, composicaoTime1995);
         denis_rodman.setId(3L);
 
         timeChicagoBullsDe1994 = new Time(clubeChicagoBulls, data1994, composicaoTime1994);

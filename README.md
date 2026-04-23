@@ -2,6 +2,8 @@
 
 API REST desenvolvida com Spring Boot para gerenciamento de times, integrantes e análises de escalações.
 
+> Este repositório contém o backend da solução. O frontend foi implementado em outro repositório separado.
+
 ## Visão Geral
 
 Este projeto resolve um desafio técnico com foco em regras de negócio complexas, arquitetura limpa e boas práticas.
@@ -17,11 +19,12 @@ Este projeto resolve um desafio técnico com foco em regras de negócio complexa
 - Swagger (OpenAPI)
 - JUnit 5 + Mockito
 
-## &#x20;Documentação
+##  Documentação
 
 A documentação foi separada para melhor organização:
 
 - Arquitetura e Design: [Arquitetura](documentacao/arquitetura.md)
+- Regras de Negócio e Processos: [Negócios](documentacao/negocios.md)
 - Como rodar o projeto: [Como Rodar](documentacao/run.md)
 - Design Patterns: [Design Patterns](documentacao/patterns.md)
 - Endpoints, HTTP e Testes: [Endpoints](documentacao/http.md)
@@ -31,6 +34,11 @@ A documentação foi separada para melhor organização:
 
 - Swagger UI: <http://localhost:8080/swagger-ui/index.html>
 - API Docs: <http://localhost:8080/v3/api-docs>
+
+## Frontend
+
+- Repositório do frontend: <https://github.com/FeJoestar18/desafioDX-Front.git>
+- O frontend consome esta API via REST.
 
 ## Testes
 
