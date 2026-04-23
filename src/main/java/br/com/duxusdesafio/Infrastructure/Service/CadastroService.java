@@ -8,14 +8,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.com.duxusdesafio.Application.Dto.CargoDto;
+import br.com.duxusdesafio.Application.Dto.CargoInputDto;
 import br.com.duxusdesafio.Application.Dto.IntegranteDto;
 import br.com.duxusdesafio.Application.Dto.IntegranteInputDto;
 import br.com.duxusdesafio.Application.Dto.TimeDto;
 import br.com.duxusdesafio.Application.Dto.TimeInputDto;
+import br.com.duxusdesafio.Application.Interfaces.Repository.ICargoRepository;
 import br.com.duxusdesafio.Application.Interfaces.Repository.IComposicaoTimeRepository;
 import br.com.duxusdesafio.Application.Interfaces.Repository.IIntegranteRepository;
 import br.com.duxusdesafio.Application.Interfaces.Repository.ITimeRepository;
 import br.com.duxusdesafio.Application.Interfaces.Services.ICadastroService;
+import br.com.duxusdesafio.Domain.Entity.Cargo;
 import br.com.duxusdesafio.Domain.Entity.ComposicaoTime;
 import br.com.duxusdesafio.Domain.Entity.Integrante;
 import br.com.duxusdesafio.Domain.Entity.Time;
@@ -28,14 +32,17 @@ public class CadastroService implements ICadastroService {
     private final ITimeRepository timeRepository;
     private final IIntegranteRepository integranteRepository;
     private final IComposicaoTimeRepository composicaoTimeRepository;
+    private final ICargoRepository cargoRepository;
 
     public CadastroService(
             ITimeRepository timeRepository,
             IIntegranteRepository integranteRepository,
-            IComposicaoTimeRepository composicaoTimeRepository) {
+            IComposicaoTimeRepository composicaoTimeRepository,
+            ICargoRepository cargoRepository) {
         this.timeRepository = timeRepository;
         this.integranteRepository = integranteRepository;
         this.composicaoTimeRepository = composicaoTimeRepository;
+        this.cargoRepository = cargoRepository;
     }
 
     @Override
@@ -132,6 +139,38 @@ public class CadastroService implements ICadastroService {
     }
 
     @Override
+    public CargoDto cadastrarCargo(CargoInputDto cargoInput) {
+        validateUniqueCargoName(cargoInput.getNome(), null);
+
+        Cargo cargo = new Cargo();
+        cargo.setNome(cargoInput.getNome());
+        Cargo salvo = cargoRepository.save(cargo);
+        return toCargoDto(salvo);
+    }
+
+    @Override
+    public java.util.List<CargoDto> listarCargos() {
+        return cargoRepository.findAll().stream()
+                .map(this::toCargoDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public CargoDto atualizarCargo(long id, CargoInputDto cargoInput) {
+        Cargo cargo = findCargoById(id);
+        validateUniqueCargoName(cargoInput.getNome(), id);
+        cargo.setNome(cargoInput.getNome());
+        Cargo atualizado = cargoRepository.save(cargo);
+        return toCargoDto(atualizado);
+    }
+
+    @Override
+    public void deletarCargo(long id) {
+        Cargo cargo = findCargoById(id);
+        cargoRepository.delete(cargo);
+    }
+
+    @Override
     public Page<TimeDto> listarTimes(Pageable pageable) {
         return timeRepository.findAll(pageable)
                 .map(this::toTimeDto);
@@ -147,6 +186,11 @@ public class CadastroService implements ICadastroService {
                 .collect(Collectors.toList());
     }
 
+    private Cargo findCargoById(long id) {
+        return cargoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Cargo não encontrado: " + id));
+    }
+
     private Time findTimeById(long id) {
         return timeRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Time não encontrado: " + id));
@@ -155,6 +199,22 @@ public class CadastroService implements ICadastroService {
     private Integrante findIntegranteById(long id) {
         return integranteRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Integrante não encontrado: " + id));
+    }
+
+    private void validateUniqueCargoName(String nome, Long currentCargoId) {
+        if (nome == null || nome.isBlank()) {
+            return;
+        }
+
+        cargoRepository.findByNomeIgnoreCase(nome.trim())
+                .filter(existing -> currentCargoId == null || existing.getId() != currentCargoId)
+                .ifPresent(existing -> {
+                    throw new IllegalArgumentException("Já existe um cargo com o nome '" + nome.trim() + "'.");
+                });
+    }
+
+    private CargoDto toCargoDto(Cargo cargo) {
+        return new CargoDto(cargo.getId(), cargo.getNome());
     }
 
     private TimeDto toTimeDto(Time time) {

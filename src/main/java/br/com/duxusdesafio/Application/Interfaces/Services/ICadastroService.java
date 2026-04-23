@@ -1,8 +1,12 @@
 package br.com.duxusdesafio.Application.Interfaces.Services;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import br.com.duxusdesafio.Application.Dto.CargoDto;
+import br.com.duxusdesafio.Application.Dto.CargoInputDto;
 import br.com.duxusdesafio.Application.Dto.IntegranteDto;
 import br.com.duxusdesafio.Application.Dto.IntegranteInputDto;
 import br.com.duxusdesafio.Application.Dto.TimeDto;
@@ -25,5 +29,13 @@ public interface ICadastroService {
 
     Page<TimeDto> listarTimes(Pageable pageable);
 
-    java.util.List<IntegranteDto> listarIntegrantesSemTimes();
+    List<IntegranteDto> listarIntegrantesSemTimes();
+
+    CargoDto cadastrarCargo(CargoInputDto cargoInput);
+
+    List<CargoDto> listarCargos();
+
+    CargoDto atualizarCargo(long id, CargoInputDto cargoInput);
+
+    void deletarCargo(long id);
 }
